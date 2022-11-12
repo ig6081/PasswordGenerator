@@ -1,5 +1,8 @@
 const lengthSlider = document.querySelector(".pass-length input"),
 options = document.querySelectorAll(".option input"),
+copyIcon = document.querySelector(".input-box span"),
+passwordInput = document.querySelector(".input-box input"),
+passIndicator = document.querySelector(".pass-indicator"),
 generateBtn = document.querySelector(".generate-btn");
 
 const characters = {
@@ -16,7 +19,7 @@ const generatePassword = () => {
 
     options.forEach(option => {
         if(option.checked){
-            if(option.id !== "exe-duplicate" && option.id !== "spaces")
+            if(option.id !== "exc-duplicate" && option.id !== "spaces")
                 staticPassword += characters[option.id];
             else if(option.id === "spaces"){
                 staticPassword += ` ${staticPassword} `;
@@ -27,21 +30,32 @@ const generatePassword = () => {
         } 
     });
     for (let i = 0; i < passLength; i++) {
-        let randomChar = staticPassword[Math.floor(Math.random()* staticPassword.length)];    
+        let randomChar = staticPassword[Math.floor(Math.random() * staticPassword.length)];    
         if(excludeDuplicate){
-            !randomPassword.contains(randomChar) || randomChar == " " ? randomPassword += randomChar : i--;
+            !randomPassword.includes(randomChar) || randomChar == " " ? randomPassword += randomChar : i--;
         }
         else randomPassword += randomChar;
     }
-    console.log(randomPassword);
+    passwordInput.value = randomPassword;
 }
 
+const updatePassIndicator = () => {
+    passIndicator.id = lengthSlider.value <= 8 ? "weak" : lengthSlider.value <= 16 ? "medium" : "strong" ;
+}
 
 const updateSlider = () => {
-    console.log(lengthSlider.value);
     document.querySelector(".pass-length span").innerText = lengthSlider.value;
+    generatePassword();
+    updatePassIndicator();
 }
 updateSlider();
-
+const copyPassword = () => {
+    navigator.clipboard.writeText(passwordInput.value);
+    copyIcon.innerText = "check";
+    setTimeout(() => {
+        copyIcon.innerText = "copy_all";
+    }, 1500);
+}
+copyIcon.addEventListener("click", copyPassword);
 lengthSlider.addEventListener("input",updateSlider);
 generateBtn.addEventListener("click",generatePassword);
